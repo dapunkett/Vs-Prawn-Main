@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TextureAtlas imagePath="selector.png">
+	<!-- Created with Adobe Animate version 24.0.4.28 -->
+	<!-- http://www.adobe.com/products/animate.html -->
+	<SubTexture name="selector0000" x="0" y="0" width="75" height="123" frameX="-2" frameY="-2" frameWidth="77" frameHeight="127"/>
+	<SubTexture name="selector0001" x="75" y="0" width="66" height="101" frameX="-11" frameY="-13" frameWidth="77" frameHeight="127"/>
+	<SubTexture name="selector0002" x="75" y="0" width="66" height="101" frameX="-11" frameY="-13" frameWidth="77" frameHeight="127"/>
+	<SubTexture name="selector0003" x="141" y="0" width="77" height="127"/>
+	<SubTexture name="selector0004" x="0" y="127" width="75" height="123" frameX="-2" frameY="-2" frameWidth="77" frameHeight="127"/>
+</TextureAtlas>

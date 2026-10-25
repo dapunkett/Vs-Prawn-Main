@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+    <!-- APP SETTINGS -->
+    <app title="Friday Night Funkin" file="Friday Night Funkin" packageName="com.nmvTeam.nightmareEngine" package="com.nmvTeam.nightmareEngine" main="Main" version="0.2.7" company="nmvTeam"/>
+
+    <window width="1280" height="720" fps="60" background="#000000" hardware="true" vsync="false"/>
+    <window if="desktop" orientation="landscape" fullscreen="false" resizable="true" vsync="false"/>
+	<window unless="mac" allow-high-dpi="true"/>
+
+    <window if="mobile" orientation="landscape" fullscreen="true" width="0" height="0" resizable="false"/>
+
+    <!-- ENGINE CONFIGS -->
+
+    <define name="MODS_ALLOWED" if="desktop"/>
+    <define name="VIDEOS_ALLOWED" if="cpp"/>
+    <define name="DISCORD_ALLOWED" if="cpp" unless="android || ios"/>
+
+    <!-- PATH SETTINGS -->
+
+    <classpath name="source"/>
+
+    <!--Fixes hxvlc using global rather than local. you will need to use hmm / hxpkg to compile this project though-->
+    <setenv name="HAXEPATH" value="./"/>
+
+    <set name="BUILD_DIR" value="export/debug" if="debug"/>
+    <set name="BUILD_DIR" value="export/release" unless="debug" />
+    <set name="BUILD_DIR" value="export/32bit" if="32bits" />
+    <set name="BUILD_DIR" value="${BUILD_DIR}-tracy" if="FEATURE_DEBUG_TRACY"/>
+
+    <assets path='assets/embeds' rename='assets' embed="true" />
+    <assets path="assets/game" rename="assets"/>
+
+    <assets path='content' embed='false' if="MODS_ALLOWED" unless="ASSET_REDIRECT"/>
+
+    <!--OpenAL config-->    <!-- appreciate you cyn0x8 and smokey for finding this -->
+    <section if="desktop">
+        <assets path="projFiles/alsoft.ini" rename="alsoft.ini" type="text" if="windows"/>
+        <assets path="projFiles/alsoft.ini" rename="alsoft.conf" type="text" unless="windows"/>
+    </section>
+
+    <!-- HAXE LIBS -->
+    <!--Core engine libraries-->
+    <haxelib name="openfl"/>
+    <haxelib name="flixel"/>
+    <haxelib name="flixel-addons"/>
+    <haxelib name="flixel-ui" version="2.6.4"/>
+    <haxelib name="flixel-animate"/>
+		
+    <haxelib name="hscript-iris" version="git"/>
+
+    <haxelib name="moonchart"/>
+
+    <haxelib name="haxeui-core"/>
+    <haxelib name="haxeui-flixel"/>
+
+    <haxelib name="funkin.vis"/>
+    <haxelib name="grig.audio"/>
+    
+    <haxelib name="json5hx"/>
+
+    <haxelib name="hxdiscord_rpc" if="DISCORD_ALLOWED" version="1.3.0"/>
+    <haxelib name="hxvlc" if="VIDEOS_ALLOWED"/>
+
+    <!-- MACROS -->
+
+    <haxeflag name="--macro" value="addMetadata('@:build(funkin.backend.macro.FlxMacro.buildFlxSprite())', 'flixel.FlxSprite')" />
+    <haxeflag name="--macro" value="addMetadata('@:build(funkin.backend.macro.FlxMacro.buildFlxCamera())', 'flixel.FlxCamera')" />
+    <haxeflag name="--macro" value="addMetadata('@:build(funkin.backend.macro.FlxMacro.buildFlxGraphic())', 'flixel.graphics.FlxGraphic')" />
+    
+    <haxeflag name="--macro" value="addMetadata('@:build(funkin.backend.macro.FlxMacro.buildFlxDrawBaseItem())', 'flixel.graphics.tile.FlxDrawBaseItem')" />
+    <haxeflag name="--macro" value="addMetadata('@:build(funkin.backend.macro.FlxMacro.buildFlxDrawItem())', 'flixel.graphics.tile.FlxDrawQuadsItem')" />
+    <haxeflag name="--macro" value="addMetadata('@:build(funkin.backend.macro.FlxMacro.buildFlxDrawItem())', 'flixel.graphics.tile.FlxDrawTrianglesItem')" />
+
+    <haxeflag name="--macro" value="addMetadata('@:nullSafety(Off)', 'hxvlc.openfl.Video')" if="VIDEOS_ALLOWED"/>
+
+    <haxeflag name="--macro" value="include('funkin')" />
+    <haxeflag name="--macro" value="include('flixel', true, ['flixel.addons.nape.*','flixel.addons.editors.*','flixel.addons.tile.FlxRayCastTilemap','flixel.system.macros'])" />
+    
+    <haxeflag name="-dce no" />
+
+    <!-- HAXEDEFS -->
+
+    <!--Needed for haxeui-->
+    <haxedef name="haxeui_dont_impose_base_class"/>
+    <haxedef name="haxeui_focus_out_on_click"/>
+
+    <!--Needed for better error reporting with hscript-->
+    <define name="hscriptPos"/>
+
+    <!--Tracy profiler defines-->
+    <section if="FEATURE_DEBUG_TRACY">
+        <haxedef name="HXCPP_TELEMETRY"/>
+        <haxedef name="HXCPP_TRACY"/>
+        <haxedef name="HXCPP_TRACY_MEMORY"/>
+        <haxedef name="HXCPP_TRACY_ON_DEMAND"/>
+        <haxedef name="absolute-paths"/>
+    </section>
+
+    <!--Enable for better crash handling/reporting-->
+    <haxedef name="CRASH_HANDLER"/>
+
+	<section if="CRASH_HANDLER">
+   		<haxedef name="openfl-enable-handle-error"/>
+    	<haxedef name="HXCPP_CHECK_POINTER"/>
+    	<haxedef name="HXCPP_STACK_LINE"/>
+    	<haxedef name="HXCPP_STACK_TRACE"/>
+	</section>
+ 
+    <!--Remove the legacy health system-->
+    <haxedef name="FLX_NO_HEALTH"/>
+
+    <!--Disable the Flixel core focus lost screen-->
+    <haxedef name="FLX_NO_FOCUS_LOST_SCREEN"/>
+
+    <!--Disable the Flixel core debugger. Automatically gets set whenever you compile in release mode!-->
+    <haxedef name="FLX_NO_DEBUG" unless="debug"/>
+
+    <!--For haxe 4.3.0 and newer cleaner error reporting-->
+    <haxedef name="message.reporting" value="pretty"/>
+
+    <!--For haxe 4.3.0 and newer disables warnings-->
+    <haxedef name="no-deprecation-warnings"/>
+
+	<!-- MISCELLANEOUS -->
+
+    <icon path="projFiles/icon/icon16.png" size='16'/>
+    <icon path="projFiles/icon/icon32.png" size='32'/>
+    <icon path="projFiles/icon/icon64.png" size='64'/>
+    <icon path="projFiles/icon/iconOG.png"/>
+</project>

@@ -1,0 +1,251 @@
+package funkin.backend;
+
+import funkin.backend.plugins.ModPlugin;
+
+import flixel.FlxG;
+import flixel.addons.transition.FlxTransitionableState;
+import flixel.util.FlxDestroyUtil;
+import flixel.group.FlxGroup.FlxTypedGroup;
+import flixel.addons.ui.FlxUIState;
+import flixel.addons.transition.FlxTransitionSprite.TransitionStatus;
+
+import funkin.backend.BaseTransitionState;
+import funkin.states.transitions.SwipeTransition;
+import funkin.data.*;
+import funkin.scripts.*;
+import funkin.input.Controls;
+
+class MusicBeatState extends FlxUIState
+{
+	/**
+	 * The considered Engine default transition. Any `FunkinTransitionState` defined as `ENGINE_DEFAULT` falls back to this.
+	 */
+	public static final DEFAULT_TRANSITION_STATE:FunkinTransitionState = SWIPE;
+	
+	/**
+	 * The transition type to use whenever exiting the state and entering another.
+	 */
+	public static var transitionInState:FunkinTransitionState = ENGINE_DEFAULT;
+	
+	/**
+	 * The transition type to use whenever entering a new state.
+	 */
+	public static var transitionOutState:FunkinTransitionState = ENGINE_DEFAULT;
+	
+	public function new() super();
+	
+	private var stepsToDo:Int = 0;
+	
+	public var curSection:Int = 0;
+	public var curStep:Int = 0;
+	public var curBeat:Int = 0;
+	
+	private var curDecStep:Float = 0;
+	private var curDecBeat:Float = 0;
+	private var controls(get, never):Controls;
+	
+	// script related vars
+	public var scripted:Bool = false;
+	public var scriptName:String = '';
+	public var scriptGroup:ScriptGroup = new ScriptGroup();
+	
+	public function initStateScript(?scriptName:String, callOnLoad:Bool = true):Bool
+	{
+		if (scriptName == null)
+		{
+			final stateName = Type.getClassName(Type.getClass(this)).split('.').pop();
+			scriptName = stateName ?? '???';
+		}
+		
+		final scriptFile = FunkinScript.getPath('scripts/states/$scriptName');
+		if (scriptGroup.exists(scriptFile)) return true;
+		
+		this.scriptName = scriptName;
+		
+		if (FunkinAssets.exists(scriptFile))
+		{
+			var newScript = FunkinScript.fromFile(scriptFile, scriptName);
+			if (newScript.parsingFailed())
+			{
+				newScript = FlxDestroyUtil.destroy(newScript);
+				return false;
+			}
+			
+			scriptGroup.parent = this;
+			
+			Logger.log('script [$scriptName] initialized', NOTICE);
+			
+			scriptGroup.addScript(newScript);
+			scripted = true;
+		}
+		
+		if (callOnLoad) scriptGroup.call('onLoad', []);
+		
+		return scripted;
+	}
+	
+	inline function get_controls():Controls return Controls.instance;
+	
+	override function create()
+	{
+		super.create();
+		
+		if (!FlxTransitionableState.skipNextTransOut && transitionOutState != NONE)
+		{
+			openSubState(Type.createInstance(BaseTransitionState.getTransitionFromState(transitionOutState), [TransitionStatus.OUT]));
+		}
+		
+		FlxTransitionableState.skipNextTransOut = false;
+		
+		ModPlugin.instance.callOnPlugins('onStateCreate');
+	}
+	
+	/**
+	 * Sorts a `FlxTypedGroup` based on objects `zIndex`.
+	 * 
+	 * used for stage layering primarily
+	 * @param group 
+	 */
+	public function refreshZ(?group:FlxTypedGroup<FlxBasic>)
+	{
+		group ??= FlxG.state;
+		group.sort(SortUtil.sortByZ, flixel.util.FlxSort.ASCENDING);
+	}
+	
+	override function update(elapsed:Float)
+	{
+		final oldStep:Int = curStep;
+		
+		updateCurStep();
+		updateBeat();
+		
+		if (curStep > oldStep)
+		{
+			for (step in oldStep...curStep)
+			{
+				curStep = step + 1;
+				
+				updateBeat();
+				
+				if (curStep >= 0) stepHit();
+			}
+			
+			if (PlayState.SONG != null) updateSection();
+		}
+		else if (PlayState.SONG != null) rollbackSection();
+		
+		final scriptArgs = [elapsed];
+		scriptGroup.call('onUpdate', scriptArgs);
+		super.update(elapsed);
+	}
+	
+	private function updateSection():Void
+	{
+		if (stepsToDo < 1) stepsToDo = Math.round(getBeatsOnSection() * 4);
+		while (curStep >= stepsToDo)
+		{
+			curSection++;
+			var beats:Float = getBeatsOnSection();
+			stepsToDo += Math.round(beats * 4);
+			sectionHit();
+		}
+	}
+	
+	private function rollbackSection():Void
+	{
+		if (curStep < 0) return;
+		
+		var lastSection:Int = curSection;
+		curSection = 0;
+		stepsToDo = 0;
+		for (i in 0...PlayState.SONG.notes.length)
+		{
+			if (PlayState.SONG.notes[i] != null)
+			{
+				stepsToDo += Math.round(getBeatsOnSection() * 4);
+				if (stepsToDo > curStep) break;
+				
+				curSection++;
+			}
+		}
+		
+		if (curSection > lastSection) sectionHit();
+	}
+	
+	private function updateBeat():Void
+	{
+		curBeat = Math.floor(curStep / 4);
+		curDecBeat = curDecStep / 4;
+	}
+	
+	private function updateCurStep():Void
+	{
+		var lastChange = Conductor.getBPMFromSeconds(Conductor.songPosition);
+		
+		var stepOffset:Float = (((Conductor.songPosition - ClientPrefs.noteOffset) - lastChange.songTime) / lastChange.stepCrotchet);
+		curStep = Math.floor(curDecStep = (lastChange.stepTime + stepOffset));
+	}
+	
+	public static function getState():MusicBeatState
+	{
+		return cast FlxG.state;
+	}
+	
+	public function stepHit():Void
+	{
+		if (curStep % 4 == 0) beatHit();
+		scriptGroup.call('onStepHit', []);
+		ModPlugin.instance.callOnPlugins('onStepHit');
+	}
+	
+	public function beatHit():Void
+	{
+		scriptGroup.call('onBeatHit', []);
+		ModPlugin.instance.callOnPlugins('onBeatHit');
+	}
+	
+	public function sectionHit():Void
+	{
+		scriptGroup.call('onSectionHit', []);
+		ModPlugin.instance.callOnPlugins('onSectionHit');
+	}
+	
+	function getBeatsOnSection():Float
+	{
+		return PlayState.SONG?.notes[curSection]?.sectionBeats ?? 4.0;
+	}
+	
+	@:access(funkin.states.FreeplayState)
+	override function startOutro(onOutroComplete:() -> Void)
+	{
+		FlxG.sound?.music?.fadeTween?.cancel();
+		FreeplayState.vocals?.fadeTween?.cancel();
+		@:nullSafety(Off)
+		if (FlxG.sound != null && FlxG.sound.music != null) FlxG.sound.music.onComplete = null;
+		
+		if (!FlxTransitionableState.skipNextTransIn && transitionInState != NONE)
+		{
+			openSubState(Type.createInstance(BaseTransitionState.getTransitionFromState(transitionInState), [TransitionStatus.IN, onOutroComplete]));
+			return;
+		}
+		
+		FlxTransitionableState.skipNextTransIn = false;
+		
+		super.startOutro(onOutroComplete);
+	}
+	
+	override function destroy()
+	{
+		scriptGroup.call('onDestroy');
+		
+		scriptGroup = FlxDestroyUtil.destroy(scriptGroup);
+		
+		super.destroy();
+	}
+	
+	override function closeSubState()
+	{
+		scriptGroup.call('onCloseSubState', []);
+		super.closeSubState();
+	}
+}

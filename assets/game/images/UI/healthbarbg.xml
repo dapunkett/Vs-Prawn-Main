@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TextureAtlas imagePath="healthbarbg.png">
+	<!-- Created with Adobe Animate version 24.0.4.28 -->
+	<!-- http://www.adobe.com/products/animate.html -->
+	<SubTexture name="healthbarbg0000" x="0" y="0" width="964" height="301" frameX="-2" frameY="-82" frameWidth="969" frameHeight="383"/>
+	<SubTexture name="healthbarbg0001" x="0" y="0" width="964" height="301" frameX="-2" frameY="-82" frameWidth="969" frameHeight="383"/>
+	<SubTexture name="healthbarbg0002" x="0" y="0" width="964" height="301" frameX="-2" frameY="-82" frameWidth="969" frameHeight="383"/>
+	<SubTexture name="healthbarbg0003" x="0" y="0" width="964" height="301" frameX="-2" frameY="-82" frameWidth="969" frameHeight="383"/>
+	<SubTexture name="healthbarbg0004" x="0" y="0" width="964" height="301" frameX="-2" frameY="-82" frameWidth="969" frameHeight="383"/>
+	<SubTexture name="healthbarbg0005" x="964" y="0" width="964" height="328" frameX="0" frameY="-51" frameWidth="969" frameHeight="383"/>
+	<SubTexture name="healthbarbg0006" x="964" y="0" width="964" height="328" frameX="0" frameY="-51" frameWidth="969" frameHeight="383"/>
+	<SubTexture name="healthbarbg0007" x="964" y="0" width="964" height="328" frameX="0" frameY="-51" frameWidth="969" frameHeight="383"/>
+	<SubTexture name="healthbarbg0008" x="964" y="0" width="964" height="328" frameX="0" frameY="-51" frameWidth="969" frameHeight="383"/>
+	<SubTexture name="healthbarbg0009" x="0" y="328" width="958" height="377" frameX="-8" frameY="0" frameWidth="969" frameHeight="383"/>
+	<SubTexture name="healthbarbg0010" x="0" y="328" width="958" height="377" frameX="-8" frameY="0" frameWidth="969" frameHeight="383"/>
+	<SubTexture name="healthbarbg0011" x="958" y="328" width="958" height="366" frameX="-8" frameY="-11" frameWidth="969" frameHeight="383"/>
+	<SubTexture name="healthbarbg0012" x="958" y="328" width="958" height="366" frameX="-8" frameY="-11" frameWidth="969" frameHeight="383"/>
+	<SubTexture name="healthbarbg0013" x="0" y="705" width="959" height="361" frameX="-10" frameY="-20" frameWidth="969" frameHeight="383"/>
+	<SubTexture name="healthbarbg0014" x="0" y="705" width="959" height="361" frameX="-10" frameY="-20" frameWidth="969" frameHeight="383"/>
+	<SubTexture name="healthbarbg0015" x="959" y="705" width="959" height="361" frameX="-10" frameY="-20" frameWidth="969" frameHeight="383"/>
+	<SubTexture name="healthbarbg0016" x="959" y="705" width="959" height="361" frameX="-10" frameY="-20" frameWidth="969" frameHeight="383"/>
+	<SubTexture name="healthbarbg0017" x="0" y="1066" width="958" height="355" frameX="-8" frameY="-22" frameWidth="969" frameHeight="383"/>
+	<SubTexture name="healthbarbg0018" x="958" y="1066" width="958" height="355" frameX="-8" frameY="-22" frameWidth="969" frameHeight="383"/>
+	<SubTexture name="healthbarbg0019" x="0" y="1421" width="958" height="355" frameX="-8" frameY="-22" frameWidth="969" frameHeight="383"/>
+</TextureAtlas>

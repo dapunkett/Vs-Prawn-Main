@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TextureAtlas imagePath="diffselector.png">
+	<!-- Created with Adobe Animate version 24.0.4.28 -->
+	<!-- http://www.adobe.com/products/animate.html -->
+	<SubTexture name="Symbol 30000" x="0" y="0" width="63" height="113"/>
+	<SubTexture name="Symbol 30001" x="63" y="0" width="49" height="89" frameX="-7" frameY="-12" frameWidth="63" frameHeight="113"/>
+	<SubTexture name="Symbol 30002" x="63" y="0" width="49" height="89" frameX="-7" frameY="-12" frameWidth="63" frameHeight="113"/>
+	<SubTexture name="Symbol 30003" x="112" y="0" width="57" height="102" frameX="-3" frameY="-5" frameWidth="63" frameHeight="113"/>
+	<SubTexture name="Symbol 30004" x="169" y="0" width="55" height="98" frameX="-4" frameY="-7" frameWidth="63" frameHeight="113"/>
+</TextureAtlas>

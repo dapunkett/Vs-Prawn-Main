@@ -1,0 +1,190 @@
+package funkin.objects.note;
+
+import funkin.data.*;
+import funkin.objects.Bopper;
+import funkin.backend.Conductor;
+import funkin.game.shaders.RGBShader;
+
+class SustainSplash extends funkin.game.modchart.ModchartNote
+{
+	public var rgbGraphics:RGBGraphics = new RGBGraphics();
+	
+	public var data(get, set):Int;
+	
+	public var player:Int = 0;
+	
+	private var _note:Note;
+	private var _strum:StrumNote;
+	
+	public var completed:Bool = false; // uhh coudl probably siwtch this up to use tail state
+	
+	// how many ms before the hold's last piece the splash starts ending (player only)
+	static inline final END_EARLY:Float = 40;
+	var endTriggered:Bool = false;
+	
+	// internal thing to optimize loading frames
+	@:noCompletion var _textureLoaded:Null<String> = null;
+	
+	public var skin:NoteSkin;
+	
+	public function new(x:Float = 0, y:Float = 0, noteData:Int = 0, player:Int = 0)
+	{
+		super(x, y);
+		
+		addAnims(NoteUtil.getSkinFromID(player));
+	}
+	
+	function addAnims(_skin:NoteSkin)
+	{
+		frames = Paths.getAtlasFrames(_skin.sustainSplashTexture);
+		
+		final animData = _skin.susSplashAnims;
+		
+		var noteData = -1;
+		for (group in animData)
+		{
+			noteData += 1;
+			for (anim in group)
+			{
+				final animName = '${anim.anim}$noteData';
+				
+				animation.addByPrefix(animName, anim.xmlName, anim.fps, anim.looping);
+				addOffset(animName, anim.offsets[0], anim.offsets[1]);
+			}
+		}
+		
+		animation.onFinish.add((anim) -> {
+			if (anim.contains('start')) playAnim('loop$data', false);
+			if (anim.contains('end')) kill();
+		});
+	}
+	
+	public override function playAnim(anim:String, force:Bool = false, isReversed:Bool = false, frame:Int = 0)
+	{
+		super.playAnim(anim, force, isReversed, frame);
+		
+		centerOffsets();
+		centerOrigin();
+	}
+	
+	public function setColors(?colors:Array<FlxColor>):Void
+	{
+		if (colors == null || skin == null) return;
+		
+		final sanitzedColourArray = colors ?? NoteUtil.colorToArray(skin.colors[data]);
+		
+		rgbGraphics.enabled = skin.inEngineColoring;
+		rgbGraphics.setColors(sanitzedColourArray);
+	}
+	
+	public function setupSplash(strum:StrumNote, ?note:Note, ?time:Float = 0.5, ?isPlayer:Bool = false, ?graphicsInput:RGBGraphics, ?field:PlayField)
+	{
+		this._note = note;
+		this._strum = strum;
+		
+		data = note.noteData;
+		
+		visible = true;
+		angle = 0;
+		alpha = 1;
+		
+		this.player = field?.player ?? 0;
+		
+		skin = NoteUtil.getSkinFromID(player);
+		
+		antialiasing = skin.antialiasing;
+		
+		if (skin?.susSplashScale != null) scale.set(skin.susSplashScale, skin.susSplashScale);
+		
+		baseScale.copyFrom(scale);
+		
+		addAnims(skin);
+		
+		updateHitbox();
+		
+		playAnim('start$data', true);
+		setColors(graphicsInput?.getColors());
+		
+		endTriggered = false;
+		
+		updatePosition();
+		
+		findTail(note);
+		__isPlayer = isPlayer;
+	}
+	
+	var __tail:Note;
+	var __isPlayer:Bool = false;
+	
+	function findTail(note:Null<Note>)
+	{
+		__tail = note;
+		if (__tail != null && __tail.tail.length > 0)
+		{
+			__tail = __tail.tail[__tail.tail.length - 1];
+		}
+	}
+	
+	function watchTail()
+	{
+		if (__tail == null || (__tail != null && __tail.garbage))
+		{
+			kill(); // die dont even splash jsut die
+			return;
+		}
+		
+		if (__tail.wasGoodHit) completed = true;
+		
+		// end the player's splash a tiny bit earlier than the hold itself (opponent stays vanilla)
+		if (__isPlayer && !endTriggered && __tail.alive && (__tail.strumTime - Conductor.songPosition) <= END_EARLY)
+		{
+			endTriggered = true;
+			
+			if (ClientPrefs.noteSplashType == "Both" || ClientPrefs.noteSplashType == "Hold Covers") playAnim('end$data', true);
+			else kill();
+		}
+		
+		if (!__tail.alive && !getAnimName().startsWith('end'))
+		{
+			completed = true;
+			
+			if (__isPlayer && (ClientPrefs.noteSplashType == "Both" || ClientPrefs.noteSplashType == "Hold Covers")) playAnim('end$data', true);
+			else kill();
+		}
+	}
+	
+	function updatePosition()
+	{
+		if (_strum == null) return;
+		
+		final _skin:NoteSkin = NoteUtil.getSkinFromID(player);
+		
+		final offsets = _skin.sustainSplashOffsets != null ? _skin.sustainSplashOffsets[data] : null;
+		
+		setPosition(_strum.x + (_strum.width - width) * .5, _strum.y + (_strum.height - height) * .5);
+		spriteOffset.set(offsets?.x, offsets?.y);
+	}
+	
+	inline function get_data():Int return noteData;
+	
+	inline function set_data(v:Int):Int return noteData = v;
+	
+	override function update(elapsed:Float)
+	{
+		super.update(elapsed);
+		
+		watchTail();
+	}
+	
+	override function drawSimple(camera:FlxCamera)
+	{
+		super.drawSimple(camera);
+		rgbGraphics.pushQuad(camera);
+	}
+	
+	override function drawComplex(camera:FlxCamera)
+	{
+		super.drawComplex(camera);
+		rgbGraphics.pushQuad(camera);
+	}
+}

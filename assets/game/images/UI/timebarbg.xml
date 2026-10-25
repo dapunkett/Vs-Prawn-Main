@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TextureAtlas imagePath="timebarbg.png">
+	<!-- Created with Adobe Animate version 24.0.4.28 -->
+	<!-- http://www.adobe.com/products/animate.html -->
+	<SubTexture name="timebarbg0000" x="0" y="0" width="506" height="85" frameX="0" frameY="0" frameWidth="506" frameHeight="92"/>
+	<SubTexture name="timebarbg0001" x="0" y="0" width="506" height="85" frameX="0" frameY="0" frameWidth="506" frameHeight="92"/>
+	<SubTexture name="timebarbg0002" x="0" y="0" width="506" height="85" frameX="0" frameY="0" frameWidth="506" frameHeight="92"/>
+	<SubTexture name="timebarbg0003" x="0" y="0" width="506" height="85" frameX="0" frameY="0" frameWidth="506" frameHeight="92"/>
+	<SubTexture name="timebarbg0004" x="506" y="0" width="506" height="91" frameX="0" frameY="0" frameWidth="506" frameHeight="92"/>
+	<SubTexture name="timebarbg0005" x="506" y="0" width="506" height="91" frameX="0" frameY="0" frameWidth="506" frameHeight="92"/>
+	<SubTexture name="timebarbg0006" x="506" y="0" width="506" height="91" frameX="0" frameY="0" frameWidth="506" frameHeight="92"/>
+	<SubTexture name="timebarbg0007" x="506" y="0" width="506" height="91" frameX="0" frameY="0" frameWidth="506" frameHeight="92"/>
+	<SubTexture name="timebarbg0008" x="0" y="91" width="506" height="92"/>
+	<SubTexture name="timebarbg0009" x="0" y="91" width="506" height="92"/>
+	<SubTexture name="timebarbg0010" x="0" y="91" width="506" height="92"/>
+	<SubTexture name="timebarbg0011" x="0" y="91" width="506" height="92"/>
+	<SubTexture name="timebarbg0012" x="506" y="91" width="506" height="92"/>
+	<SubTexture name="timebarbg0013" x="506" y="91" width="506" height="92"/>
+	<SubTexture name="timebarbg0014" x="506" y="91" width="506" height="92"/>
+	<SubTexture name="timebarbg0015" x="506" y="91" width="506" height="92"/>
+	<SubTexture name="timebarbg0016" x="0" y="183" width="506" height="90" frameX="0" frameY="0" frameWidth="506" frameHeight="92"/>
+	<SubTexture name="timebarbg0017" x="0" y="183" width="506" height="90" frameX="0" frameY="0" frameWidth="506" frameHeight="92"/>
+	<SubTexture name="timebarbg0018" x="0" y="183" width="506" height="90" frameX="0" frameY="0" frameWidth="506" frameHeight="92"/>
+	<SubTexture name="timebarbg0019" x="0" y="183" width="506" height="90" frameX="0" frameY="0" frameWidth="506" frameHeight="92"/>
+	<SubTexture name="timebarbg0020" x="506" y="183" width="506" height="80" frameX="0" frameY="-1" frameWidth="506" frameHeight="92"/>
+	<SubTexture name="timebarbg0021" x="506" y="183" width="506" height="80" frameX="0" frameY="-1" frameWidth="506" frameHeight="92"/>
+	<SubTexture name="timebarbg0022" x="0" y="273" width="506" height="76" frameX="0" frameY="-1" frameWidth="506" frameHeight="92"/>
+	<SubTexture name="timebarbg0023" x="0" y="273" width="506" height="76" frameX="0" frameY="-1" frameWidth="506" frameHeight="92"/>
+	<SubTexture name="timebarbg0024" x="0" y="273" width="506" height="76" frameX="0" frameY="-1" frameWidth="506" frameHeight="92"/>
+</TextureAtlas>
