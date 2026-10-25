@@ -65,12 +65,28 @@ class FreeplayState extends MusicBeatState
 	public var diffArrowLeft:FlxSprite;
 	public var diffArrowRight:FlxSprite;
 	public var sprDifficulty:FlxSprite;
+	public var sprDifficultyOld:FlxSprite;
+	public var diffTextOld:FlxText;
+	var diffTweenIn:FlxTween;
+	var diffTweenOut:FlxTween;
+	var diffTextTweenIn:FlxTween;
+	var diffTextTweenOut:FlxTween;
 	public var grpSongs:FlxTypedGroup<Alphabet>;
 	public var grpIcons:FlxTypedGroup<HealthIcon>;
 	public var curPlaying:Bool = false;
 	
 	public var bg:FlxSprite;
 	public var intendedColor:Int;
+	public var rightPanel:FlxSprite;
+	public var karidesDJ:FlxSprite;
+	public var karidesOffsets:Map<String, Array<Float>> = [
+		'intro' => [5, 424],
+		'idle' => [0, 0],
+		'confirm' => [18, -28]
+	];
+	public var karidesPos:Array<Float> = [875, 231];
+	var busy:Bool = false;
+	var songStarted:Bool = false;
 	
 	var mayGoToChartConverter:Bool = false;
 	
@@ -117,6 +133,36 @@ class FreeplayState extends MusicBeatState
 		add(bg);
 		bg.screenCenter();
 		
+		rightPanel = new FlxSprite();
+		rightPanel.loadGraphic(Paths.image('menus/freeplay/rightpanel'));
+		final panelWidth:Float = 615;
+		rightPanel.scale.set(panelWidth / 712, FlxG.height / rightPanel.height);
+		rightPanel.updateHitbox();
+		rightPanel.x = FlxG.width - panelWidth;
+		rightPanel.y = 0;
+		rightPanel.antialiasing = ClientPrefs.globalAntialiasing;
+		add(rightPanel);
+		
+		loadDJConfig();
+		karidesDJ = new FlxSprite(karidesPos[0], karidesPos[1]);
+		karidesDJ.frames = Paths.getSparrowAtlas('menus/freeplay/karidesdj');
+		karidesDJ.animation.addByPrefix('intro', 'boyfriend dj intro', 24, false);
+		karidesDJ.animation.addByPrefix('idle', 'Boyfriend DJ idle', 24, true);
+		karidesDJ.animation.addByPrefix('confirm', 'Boyfriend DJ confirm', 24, false);
+		karidesDJ.antialiasing = ClientPrefs.globalAntialiasing;
+		karidesDJ.animation.finishCallback = (name:String) -> {
+			if (name == 'intro')
+			{
+				playKaridesDJAnim('idle');
+			}
+			else if (name == 'confirm')
+			{
+				startSelectedSong();
+			}
+		};
+		playKaridesDJAnim('intro', true);
+		add(karidesDJ);
+		
 		grpCards = new FlxTypedGroup<FreeplayCard>();
 		add(grpCards);
 		
@@ -143,10 +189,37 @@ class FreeplayState extends MusicBeatState
 		diffSelectBox = new FlxSprite().loadGraphic(Paths.image('menus/freeplay/diffselectbox'));
 		diffSelectBox.scale.set(0.84, 0.84);
 		diffSelectBox.updateHitbox();
-		diffSelectBox.x = FlxG.width - diffSelectBox.width + 15;
+		diffSelectBox.x = FlxG.width - diffSelectBox.width + 35;
 		diffSelectBox.y = -5;
 		diffSelectBox.antialiasing = ClientPrefs.globalAntialiasing;
 		add(diffSelectBox);
+		
+		final darkCenterX:Float = diffSelectBox.x + (296.5 * diffSelectBox.scale.x);
+		final darkCenterY:Float = diffSelectBox.y + (89.5 * diffSelectBox.scale.y);
+		final darkRectW:Float = 342 * diffSelectBox.scale.x;
+		final darkRectLeft:Float = diffSelectBox.x + (126 * diffSelectBox.scale.x);
+		final darkRectRight:Float = diffSelectBox.x + (467 * diffSelectBox.scale.x);
+		
+		sprDifficultyOld = new FlxSprite();
+		sprDifficultyOld.antialiasing = ClientPrefs.globalAntialiasing;
+		sprDifficultyOld.visible = false;
+		add(sprDifficultyOld);
+		
+		diffTextOld = new FlxText(darkRectLeft, 0, darkRectW, "", 34);
+		diffTextOld.setFormat(Paths.font('round'), 34, FlxColor.WHITE, CENTER, OUTLINE, 0xFF2A1505);
+		diffTextOld.antialiasing = ClientPrefs.globalAntialiasing;
+		diffTextOld.visible = false;
+		add(diffTextOld);
+
+		sprDifficulty = new FlxSprite();
+		sprDifficulty.antialiasing = ClientPrefs.globalAntialiasing;
+		add(sprDifficulty);
+		
+		diffText = new FlxText(darkRectLeft, 0, darkRectW, "", 34);
+		diffText.setFormat(Paths.font('round'), 34, FlxColor.WHITE, CENTER, OUTLINE, 0xFF2A1505);
+		diffText.antialiasing = ClientPrefs.globalAntialiasing;
+		diffText.y = darkCenterY - (diffText.height / 2);
+		add(diffText);
 		
 		diffArrowLeft = new FlxSprite();
 		diffArrowLeft.frames = Paths.getSparrowAtlas('menus/freeplay/diffselector');
@@ -159,8 +232,8 @@ class FreeplayState extends MusicBeatState
 		};
 		diffArrowLeft.scale.set(0.72, 0.72);
 		diffArrowLeft.updateHitbox();
-		diffArrowLeft.x = diffSelectBox.x + 65;
-		diffArrowLeft.y = diffSelectBox.y + (diffSelectBox.height - diffArrowLeft.height) / 2 + 2;
+		diffArrowLeft.x = darkRectLeft - diffArrowLeft.width - 10;
+		diffArrowLeft.y = darkCenterY - (diffArrowLeft.height / 2);
 		diffArrowLeft.antialiasing = ClientPrefs.globalAntialiasing;
 		add(diffArrowLeft);
 		
@@ -176,21 +249,10 @@ class FreeplayState extends MusicBeatState
 		diffArrowRight.flipX = true;
 		diffArrowRight.scale.set(0.72, 0.72);
 		diffArrowRight.updateHitbox();
-		diffArrowRight.x = diffSelectBox.x + diffSelectBox.width - diffArrowRight.width - 55;
+		diffArrowRight.x = darkRectRight + 10;
 		diffArrowRight.y = diffArrowLeft.y;
 		diffArrowRight.antialiasing = ClientPrefs.globalAntialiasing;
 		add(diffArrowRight);
-		
-		sprDifficulty = new FlxSprite();
-		sprDifficulty.antialiasing = ClientPrefs.globalAntialiasing;
-		add(sprDifficulty);
-		
-		final dTextWidth:Float = diffArrowRight.x - (diffArrowLeft.x + diffArrowLeft.width);
-		diffText = new FlxText(diffArrowLeft.x + diffArrowLeft.width, 0, dTextWidth, "", 34);
-		diffText.setFormat(Paths.font('round'), 34, 0xFF4A2508, CENTER);
-		diffText.antialiasing = ClientPrefs.globalAntialiasing;
-		diffText.y = diffSelectBox.y + (diffSelectBox.height - diffText.height) / 2 - 2;
-		add(diffText);
 		
 		scoreBG = new FlxSprite();
 		scoreBG.visible = false;
@@ -416,6 +478,12 @@ class FreeplayState extends MusicBeatState
 				diffArrowRight.animation.play('idle');
 		}
 		
+		if (busy)
+		{
+			super.update(elapsed);
+			return;
+		}
+		
 		var shiftMult:Int = 1;
 		if (FlxG.keys.pressed.SHIFT) shiftMult = 3;
 		
@@ -511,51 +579,37 @@ class FreeplayState extends MusicBeatState
 		}
 		else if (controls.ACCEPT)
 		{
+			if (busy) return;
+			busy = true;
+			
 			if (cardSelector != null)
 			{
 				cardSelector.animation.play('press', true);
 				cardSelector.scale.set(1.25, 1.25);
 			}
-			persistentUpdate = false;
 			
-			final songName = Paths.sanitize(songs[curSelected].songName.toLowerCase());
+			FunkinSound.play(Paths.sound('confirmMenu'));
 			
-			final songRet = PlayState.prepareForSong(songName, curDifficulty, false);
-			
-			if (songRet != null)
+			if (FlxG.sound.music != null)
 			{
-				var error = songRet.toString();
-				
-				if (error.contains('incompatible format') && !error.contains(ChartFormat.UNKNOWN)) // scuffed method...
-				{
-					error += "\n\nIf you'd like to enter the chart converter press Accept.\nOtherwise, press Cancel to go back";
-					mayGoToChartConverter = true;
-				}
-				
-				final message = 'Failed to load song.\nException: $error';
-				debugBG.alpha = 0.7;
-				debugTxt.text = message;
-				debugTxt.screenCenter(Y);
-				
-				FlxG.sound.play(Paths.sound('cancelMenu'));
-				
-				super.update(FlxG.elapsed);
-				return;
+				FlxG.sound.music.fadeOut(1.2, 0);
+			}
+			if (vocals != null)
+			{
+				vocals.fadeOut(1.2, 0);
 			}
 			
-			
-			if (FlxG.keys.pressed.SHIFT)
+			if (karidesDJ != null)
 			{
-				FlxG.switchState(ChartEditorState.new);
+				playKaridesDJAnim('confirm', true);
+				new flixel.util.FlxTimer().start(1.4, (tmr) -> {
+					startSelectedSong();
+				});
 			}
 			else
 			{
-				FlxG.switchState(PlayState.new);
+				startSelectedSong();
 			}
-			
-			if (FlxG.sound.music != null) FlxG.sound.music.volume = 0;
-			
-			destroyFreeplayVocals();
 		}
 		else if (controls.RESET)
 		{
@@ -575,6 +629,98 @@ class FreeplayState extends MusicBeatState
 			vocals.destroy();
 		}
 		vocals = null;
+	}
+	
+	function loadDJConfig()
+	{
+		final jsonPath = "assets/game/data/dj/karides.json";
+		#if sys
+		if (sys.FileSystem.exists(jsonPath))
+		{
+			try
+			{
+				var content = sys.io.File.getContent(jsonPath);
+				var data:Dynamic = haxe.Json.parse(content);
+				if (data.position != null)
+				{
+					karidesPos[0] = data.position[0];
+					karidesPos[1] = data.position[1];
+				}
+				if (data.animations != null)
+				{
+					var anims:Array<Dynamic> = data.animations;
+					for (a in anims)
+					{
+						if (a.anim != null && a.offsets != null)
+						{
+							karidesOffsets.set(a.anim, [a.offsets[0], a.offsets[1]]);
+						}
+					}
+				}
+			}
+			catch (e:Dynamic)
+			{
+				trace('Could not parse $jsonPath: $e');
+			}
+		}
+		#end
+	}
+	
+	public function playKaridesDJAnim(name:String, forced:Bool = false)
+	{
+		if (karidesDJ == null) return;
+		karidesDJ.animation.play(name, forced);
+		final off = karidesOffsets.get(name);
+		if (off != null)
+			karidesDJ.offset.set(off[0], off[1]);
+		else
+			karidesDJ.offset.set(0, 0);
+	}
+	
+	function startSelectedSong()
+	{
+		if (songStarted) return;
+		songStarted = true;
+		
+		persistentUpdate = false;
+		
+		final songName = Paths.sanitize(songs[curSelected].songName.toLowerCase());
+		final songRet = PlayState.prepareForSong(songName, curDifficulty, false);
+		
+		if (songRet != null)
+		{
+			var error = songRet.toString();
+			
+			if (error.contains('incompatible format') && !error.contains(ChartFormat.UNKNOWN)) // scuffed method...
+			{
+				error += "\n\nIf you'd like to enter the chart converter press Accept.\nOtherwise, press Cancel to go back";
+				mayGoToChartConverter = true;
+			}
+			
+			final message = 'Failed to load song.\nException: $error';
+			debugBG.alpha = 0.7;
+			debugTxt.text = message;
+			debugTxt.screenCenter(Y);
+			
+			FlxG.sound.play(Paths.sound('cancelMenu'));
+			
+			busy = false;
+			songStarted = false;
+			playKaridesDJAnim('idle');
+			return;
+		}
+		
+		if (FlxG.keys.pressed.SHIFT)
+		{
+			FlxG.switchState(ChartEditorState.new);
+		}
+		else
+		{
+			FlxG.switchState(PlayState.new);
+		}
+		
+		if (FlxG.sound.music != null) FlxG.sound.music.volume = 0;
+		destroyFreeplayVocals();
 	}
 	
 	function loadFreeplayData()
@@ -684,6 +830,44 @@ class FreeplayState extends MusicBeatState
 			diffArrowRight.scale.set(0.85, 0.85);
 		}
 		
+		var hadOldGraphic:Bool = false;
+		var hadOldText:Bool = false;
+		
+		if (change != 0)
+		{
+			if (diffTweenIn != null) { diffTweenIn.cancel(); diffTweenIn = null; }
+			if (diffTweenOut != null) { diffTweenOut.cancel(); diffTweenOut = null; }
+			if (diffTextTweenIn != null) { diffTextTweenIn.cancel(); diffTextTweenIn = null; }
+			if (diffTextTweenOut != null) { diffTextTweenOut.cancel(); diffTextTweenOut = null; }
+			
+			if (sprDifficulty != null && sprDifficulty.visible && sprDifficulty.graphic != null)
+			{
+				sprDifficultyOld.loadGraphic(sprDifficulty.graphic);
+				sprDifficultyOld.scale.set(sprDifficulty.scale.x, sprDifficulty.scale.y);
+				sprDifficultyOld.updateHitbox();
+				sprDifficultyOld.x = sprDifficulty.x;
+				sprDifficultyOld.y = sprDifficulty.y;
+				sprDifficultyOld.alpha = sprDifficulty.alpha;
+				sprDifficultyOld.visible = true;
+				hadOldGraphic = true;
+			}
+			else if (diffText != null && diffText.visible)
+			{
+				diffTextOld.text = diffText.text;
+				diffTextOld.fieldWidth = diffText.fieldWidth;
+				diffTextOld.x = diffText.x;
+				diffTextOld.y = diffText.y;
+				diffTextOld.alpha = diffText.alpha;
+				diffTextOld.visible = true;
+				hadOldText = true;
+			}
+		}
+		else
+		{
+			if (sprDifficultyOld != null) sprDifficultyOld.visible = false;
+			if (diffTextOld != null) diffTextOld.visible = false;
+		}
+		
 		curDifficulty = FlxMath.wrap(curDifficulty + change, 0, Difficulty.difficulties.length - 1);
 		
 		lastDifficultyName = Difficulty.difficulties[curDifficulty];
@@ -697,39 +881,98 @@ class FreeplayState extends MusicBeatState
 		var sanitizedDiff:String = Paths.sanitize(diff);
 		var hasDiffGraphic:Bool = Paths.fileExists('images/menus/story/difficulties/' + sanitizedDiff + '.png');
 		
+		final darkCenterX:Float = diffSelectBox.x + (296.5 * diffSelectBox.scale.x);
+		final darkCenterY:Float = diffSelectBox.y + (89.5 * diffSelectBox.scale.y);
+		final slideDist:Float = 55.0;
+		final slideDir:Float = (change > 0) ? 1.0 : -1.0;
+		final animDuration:Float = 0.15;
+		
 		if (hasDiffGraphic && sprDifficulty != null)
 		{
 			sprDifficulty.visible = true;
-			diffText.visible = false;
+			if (diffText != null) diffText.visible = false;
 			sprDifficulty.loadGraphic(Paths.image('menus/story/difficulties/' + sanitizedDiff));
 			sprDifficulty.scale.set(0.85, 0.85);
 			sprDifficulty.updateHitbox();
-			if (diffArrowLeft != null && diffArrowRight != null)
-			{
-				final bannerCenterAreaX:Float = diffArrowLeft.x + diffArrowLeft.width;
-				final bannerCenterAreaW:Float = diffArrowRight.x - bannerCenterAreaX;
-				sprDifficulty.x = bannerCenterAreaX + (bannerCenterAreaW - sprDifficulty.width) / 2;
-				sprDifficulty.y = diffSelectBox.y + (diffSelectBox.height - sprDifficulty.height) / 2 - 2;
-			}
+			
+			final targetX:Float = darkCenterX - (sprDifficulty.width / 2);
+			final targetY:Float = darkCenterY - (sprDifficulty.height / 2);
+			sprDifficulty.y = targetY;
+			
 			if (change != 0)
 			{
+				sprDifficulty.x = targetX - (slideDir * slideDist);
 				sprDifficulty.alpha = 0;
-				sprDifficulty.y -= 8;
-				FlxTween.cancelTweensOf(sprDifficulty);
-				FlxTween.tween(sprDifficulty, {alpha: 1, y: sprDifficulty.y + 8}, 0.07, {ease: FlxEase.cubeOut});
+				diffTweenIn = FlxTween.tween(sprDifficulty, {x: targetX, alpha: 1}, animDuration, {
+					ease: FlxEase.cubeOut,
+					onComplete: (_) -> {
+						diffTweenIn = null;
+					}
+				});
 			}
 			else
 			{
+				sprDifficulty.x = targetX;
 				sprDifficulty.alpha = 1;
 			}
 		}
 		else
 		{
 			if (sprDifficulty != null) sprDifficulty.visible = false;
-			diffText.visible = true;
-			diffText.text = Difficulty.getCurrentDifficultyString().toUpperCase();
-			if (diffSelectBox != null)
-				diffText.y = diffSelectBox.y + (diffSelectBox.height - diffText.height) / 2 - 2;
+			if (diffText != null)
+			{
+				diffText.visible = true;
+				diffText.text = Difficulty.getCurrentDifficultyString().toUpperCase();
+				diffText.fieldWidth = 342 * diffSelectBox.scale.x;
+				diffText.updateHitbox();
+				
+				final targetX:Float = diffSelectBox.x + (126 * diffSelectBox.scale.x);
+				final targetY:Float = darkCenterY - (diffText.height / 2);
+				diffText.y = targetY;
+				
+				if (change != 0)
+				{
+					diffText.x = targetX - (slideDir * slideDist);
+					diffText.alpha = 0;
+					diffTextTweenIn = FlxTween.tween(diffText, {x: targetX, alpha: 1}, animDuration, {
+						ease: FlxEase.cubeOut,
+						onComplete: (_) -> {
+							diffTextTweenIn = null;
+						}
+					});
+				}
+				else
+				{
+					diffText.x = targetX;
+					diffText.alpha = 1;
+				}
+			}
+		}
+		
+		if (change != 0)
+		{
+			if (hadOldGraphic && sprDifficultyOld != null)
+			{
+				final oldTargetX:Float = sprDifficultyOld.x + (slideDir * slideDist);
+				diffTweenOut = FlxTween.tween(sprDifficultyOld, {x: oldTargetX, alpha: 0}, animDuration, {
+					ease: FlxEase.cubeOut,
+					onComplete: (_) -> {
+						sprDifficultyOld.visible = false;
+						diffTweenOut = null;
+					}
+				});
+			}
+			if (hadOldText && diffTextOld != null)
+			{
+				final oldTextTargetX:Float = diffTextOld.x + (slideDir * slideDist);
+				diffTextTweenOut = FlxTween.tween(diffTextOld, {x: oldTextTargetX, alpha: 0}, animDuration, {
+					ease: FlxEase.cubeOut,
+					onComplete: (_) -> {
+						diffTextOld.visible = false;
+						diffTextTweenOut = null;
+					}
+				});
+			}
 		}
 		
 		positionHighscore();
@@ -870,16 +1113,25 @@ class FreeplayState extends MusicBeatState
 	{
 		if (diffSelectBox != null)
 		{
-			if (sprDifficulty != null && sprDifficulty.visible && diffArrowLeft != null && diffArrowRight != null)
+			final darkCenterX:Float = diffSelectBox.x + (296.5 * diffSelectBox.scale.x);
+			final darkCenterY:Float = diffSelectBox.y + (89.5 * diffSelectBox.scale.y);
+
+			if (sprDifficulty != null && sprDifficulty.visible)
 			{
-				final bannerCenterAreaX:Float = diffArrowLeft.x + diffArrowLeft.width;
-				final bannerCenterAreaW:Float = diffArrowRight.x - bannerCenterAreaX;
-				sprDifficulty.x = bannerCenterAreaX + (bannerCenterAreaW - sprDifficulty.width) / 2;
-				sprDifficulty.y = diffSelectBox.y + (diffSelectBox.height - sprDifficulty.height) / 2 - 2;
+				if (diffTweenIn == null || !diffTweenIn.active)
+				{
+					sprDifficulty.x = darkCenterX - (sprDifficulty.width / 2);
+					sprDifficulty.y = darkCenterY - (sprDifficulty.height / 2);
+				}
 			}
 			else if (diffText != null)
 			{
-				diffText.y = diffSelectBox.y + (diffSelectBox.height - diffText.height) / 2 - 2;
+				if (diffTextTweenIn == null || !diffTextTweenIn.active)
+				{
+					diffText.fieldWidth = 342 * diffSelectBox.scale.x;
+					diffText.x = diffSelectBox.x + (126 * diffSelectBox.scale.x);
+					diffText.y = darkCenterY - (diffText.height / 2);
+				}
 			}
 			
 			if (scoreText != null)

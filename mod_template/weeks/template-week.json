@@ -1,0 +1,26 @@
+{
+    "storyName": "Template Week",
+    "weekName": "Template Week",
+    "hideFreeplay": false,
+    "hideStoryMode": false,
+    "weekBackground": "stage",
+    "difficulties": "Easy, Normal, Hard",
+    "weekBefore": "",
+    "startUnlocked": true,
+    "weekCharacters": [
+        "dad",
+        "bf",
+        "gf"
+    ],
+    "songs": [
+        [
+            "template-song",
+            "bf",
+            [
+                49,
+                176,
+                209
+            ]
+        ]
+    ]
+}

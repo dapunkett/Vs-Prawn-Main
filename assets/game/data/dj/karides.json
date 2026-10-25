@@ -1,0 +1,27 @@
+{
+	"position": [875, 231],
+	"scale": 1.0,
+	"animations": [
+		{
+			"anim": "intro",
+			"name": "boyfriend dj intro",
+			"fps": 24,
+			"loop": false,
+			"offsets": [5, 424]
+		},
+		{
+			"anim": "idle",
+			"name": "Boyfriend DJ idle",
+			"fps": 24,
+			"loop": true,
+			"offsets": [0, 0]
+		},
+		{
+			"anim": "confirm",
+			"name": "Boyfriend DJ confirm",
+			"fps": 24,
+			"loop": false,
+			"offsets": [18, -28]
+		}
+	]
+}

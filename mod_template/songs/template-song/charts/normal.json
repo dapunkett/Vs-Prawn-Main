@@ -1,0 +1,71 @@
+{
+    "song": {
+        "song": "template-song",
+        "notes": [
+            {
+                "lengthInSteps": 16,
+                "mustHitSection": true,
+                "sectionNotes": [
+                    [
+                        0,
+                        0,
+                        0
+                    ],
+                    [
+                        500,
+                        1,
+                        0
+                    ],
+                    [
+                        1000,
+                        2,
+                        0
+                    ],
+                    [
+                        1500,
+                        3,
+                        0
+                    ]
+                ],
+                "bpm": 100,
+                "changeBPM": false
+            },
+            {
+                "lengthInSteps": 16,
+                "mustHitSection": false,
+                "sectionNotes": [
+                    [
+                        2000,
+                        0,
+                        0
+                    ],
+                    [
+                        2500,
+                        1,
+                        0
+                    ],
+                    [
+                        3000,
+                        2,
+                        0
+                    ],
+                    [
+                        3500,
+                        3,
+                        0
+                    ]
+                ],
+                "bpm": 100,
+                "changeBPM": false
+            }
+        ],
+        "bpm": 100,
+        "needsVoices": false,
+        "speed": 2.0,
+        "player1": "bf",
+        "player2": "dad",
+        "gfVersion": "gf",
+        "stage": "template-stage",
+        "validScore": true
+    }
+}

@@ -16,6 +16,7 @@ class MasterEditorMenu extends MusicBeatState
 	var options:Array<String> = [
 		'Chart Editor',
 		'Character Editor',
+		'DJ Editor',
 		'Note Skin Editor',
 		'Chart Converter',
 		"Metadata Editor",
@@ -124,6 +125,8 @@ class MasterEditorMenu extends MusicBeatState
 					FlxG.switchState(() -> new ModsState());
 				case 'Character Editor':
 					FlxG.switchState(() -> new CharacterEditorState(Character.DEFAULT_CHARACTER, false));
+				case 'DJ Editor':
+					FlxG.switchState(() -> new DJEditorState());
 				case 'Week Editor':
 					FlxG.switchState(() -> new WeekEditorState());
 				case 'Metadata Editor':

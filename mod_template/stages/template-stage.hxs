@@ -1,0 +1,21 @@
+import flixel.FlxSprite;
+
+var bg:FlxSprite;
+
+function onLoad()
+{
+    // Setup background sprites here:
+    // bg = new FlxSprite(-600, -200).loadGraphic(Paths.image('stageback'));
+    // bg.scrollFactor.set(0.9, 0.9);
+    // add(bg);
+}
+
+function onUpdate(elapsed)
+{
+    // Frame updates
+}
+
+function onBeatHit()
+{
+    // Beat hits
+}

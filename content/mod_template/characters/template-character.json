@@ -1,0 +1,78 @@
+{
+    "animations": [
+        {
+            "anim": "idle",
+            "name": "BF idle dance",
+            "fps": 24,
+            "loop": false,
+            "indices": [],
+            "offsets": [
+                0,
+                0
+            ]
+        },
+        {
+            "anim": "singLEFT",
+            "name": "BF NOTE LEFT0",
+            "fps": 24,
+            "loop": false,
+            "indices": [],
+            "offsets": [
+                12,
+                -6
+            ]
+        },
+        {
+            "anim": "singDOWN",
+            "name": "BF NOTE DOWN0",
+            "fps": 24,
+            "loop": false,
+            "indices": [],
+            "offsets": [
+                -10,
+                -50
+            ]
+        },
+        {
+            "anim": "singUP",
+            "name": "BF NOTE UP0",
+            "fps": 24,
+            "loop": false,
+            "indices": [],
+            "offsets": [
+                -29,
+                27
+            ]
+        },
+        {
+            "anim": "singRIGHT",
+            "name": "BF NOTE RIGHT0",
+            "fps": 24,
+            "loop": false,
+            "indices": [],
+            "offsets": [
+                -41,
+                -7
+            ]
+        }
+    ],
+    "no_antialiasing": false,
+    "image": "characters/BOYFRIEND",
+    "position": [
+        0,
+        0
+    ],
+    "healthicon": "bf",
+    "flip_x": true,
+    "healthbar_colors": [
+        49,
+        176,
+        209
+    ],
+    "camera_position": [
+        0,
+        0
+    ],
+    "sing_duration": 4.0,
+    "scale": 1.0
+}

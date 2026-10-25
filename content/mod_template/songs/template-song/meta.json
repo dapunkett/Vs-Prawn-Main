@@ -1,0 +1,12 @@
+{
+    "songName": "template-song",
+    "displayName": "Template Song",
+    "composers": [
+        "Composer Name"
+    ],
+    "charters": [
+        "Charter Name"
+    ],
+    "freeplayColor": "#31B0D1",
+    "freeplayIcon": "bf"
+}

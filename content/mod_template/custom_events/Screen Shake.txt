@@ -1,0 +1,2 @@
+Value 1: Duration, Intensity (e.g. 0.2, 0.02)
+Value 2: Camera (camGame / camHUD)

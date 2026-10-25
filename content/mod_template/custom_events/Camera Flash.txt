@@ -1,0 +1,2 @@
+Value 1: Hex color (e.g. #ffffff)
+Value 2: Duration in seconds (e.g. 0.5)

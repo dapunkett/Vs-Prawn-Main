@@ -31,5 +31,7 @@ dump/*
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
-/content
+content/*
+!content/mod_template/
+*RECOVER*.fla
 desktop.ini
