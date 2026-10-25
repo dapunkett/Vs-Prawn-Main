@@ -1,8 +1,8 @@
 {
     "name": "Template Mod",
-    "description": "Template mod for NightmareVision Engine (Vs Prawn). Copy or rename this folder to create your own mod!",
+    "description": "A template mod for NightmareVision Engine. Structured identically to base-game-main.",
     "global": false,
-    "windowTitle": "Friday Night Funkin' - Custom Mod",
+    "windowTitle": "Friday Night Funkin'",
     "iconFile": "UI/icon64",
     "defaultTransition": "swipe"
 }

@@ -1,1 +1,0 @@
-A template song for testing and custom mod development.

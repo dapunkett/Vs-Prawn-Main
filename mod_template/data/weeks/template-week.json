@@ -1,0 +1,25 @@
+{
+    "songs": [
+        [
+            "template-song",
+            "bf",
+            [
+                49,
+                176,
+                209
+            ]
+        ]
+    ],
+    "weekCharacters": [
+        "",
+        "bf",
+        "gf"
+    ],
+    "weekBackground": "stage",
+    "storyName": "Template Week",
+    "weekBefore": "",
+    "weekName": "Template Week",
+    "startUnlocked": true,
+    "hideStoryMode": false,
+    "hideFreeplay": false
+}

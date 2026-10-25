@@ -1,16 +1,5 @@
 {
     "song": {
-        "events": [
-            [
-                0,
-                [
-                    [
-                        "Camera Flash",
-                        "#ffffff",
-                        "0.5"
-                    ]
-                ]
-            ]
-        ]
+        "events": []
     }
 }
